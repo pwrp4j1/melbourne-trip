@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Melbourne Holiday Itinerary — Jul 2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a56db 0%, #1e3a8a 100%);
+      color: white;
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.4rem; }
+    header p { font-size: 0.95rem; opacity: 0.85; }
+    .badge-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: 0.9rem; }
+    .badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      background: #1e3a8a;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex: 0 0 auto;
+      padding: 0.75rem 1.25rem;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.65);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .tab-btn:hover { color: white; }
+    .tab-btn.active { color: white; border-bottom-color: #60a5fa; }
+
+    /* Content */
+    .tab-content { display: none; padding: 1.25rem; max-width: 960px; margin: 0 auto; }
+    .tab-content.active { display: block; }
+
+    /* Day cards */
+    .day-card {
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .day-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .day-header:hover { opacity: 0.9; }
+    .day-date { font-weight: 700; font-size: 0.95rem; min-width: 80px; }
+    .day-title { font-size: 0.88rem; font-weight: 600; flex: 1; }
+    .day-chevron { font-size: 0.75rem; transition: transform 0.2s; }
+    .day-card.open .day-chevron { transform: rotate(180deg); }
+    .day-body { display: none; border-top: 1px solid #e5e7eb; }
+    .day-card.open .day-body { display: block; }
+
+    /* Colour themes per day type */
+    .theme-normal .day-header { background: #eff6ff; }
+    .theme-normal .day-date { color: #1d4ed8; }
+    .theme-sydney .day-header { background: #f0fdf4; }
+    .theme-sydney .day-date { color: #15803d; }
+    .theme-rest .day-header { background: #fafafa; }
+    .theme-rest .day-date { color: #6b7280; }
+    .theme-free .day-header { background: #fdf4ff; }
+    .theme-free .day-date { color: #7e22ce; }
+    .theme-depart .day-header { background: #fff7ed; }
+    .theme-depart .day-date { color: #c2410c; }
+
+    /* Events within a day */
+    .event-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 0.5rem;
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      align-items: start;
+    }
+    .event-row:last-child { border-bottom: none; }
+    .event-time { font-size: 0.78rem; color: #6b7280; font-weight: 500; padding-top: 1px; }
+    .event-details h4 { font-size: 0.88rem; font-weight: 600; color: #111827; }
+    .event-details .loc { font-size: 0.78rem; color: #6b7280; margin-top: 2px; }
+    .event-details .note { font-size: 0.78rem; color: #92400e; background: #fffbeb; border-left: 3px solid #f59e0b; padding: 3px 6px; border-radius: 3px; margin-top: 4px; }
+    .badge-fixed { display: inline-block; background: #fee2e2; color: #b91c1c; font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; margin-left: 5px; vertical-align: middle; }
+    .badge-optional { display: inline-block; background: #e0e7ff; color: #3730a3; font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; margin-left: 5px; vertical-align: middle; }
+
+    /* Quick Reference table */
+    .ref-table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); font-size: 0.85rem; }
+    .ref-table th { background: #1e3a8a; color: white; padding: 0.65rem 0.85rem; text-align: left; font-weight: 600; }
+    .ref-table td { padding: 0.6rem 0.85rem; border-bottom: 1px solid #f3f4f6; }
+    .ref-table tr:last-child td { border-bottom: none; }
+    .ref-table tr:hover td { background: #f8fafc; }
+
+    /* Checklist */
+    .checklist { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); overflow: hidden; }
+    .check-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      cursor: pointer;
+    }
+    .check-item:last-child { border-bottom: none; }
+    .check-item:hover { background: #f8fafc; }
+    .check-box {
+      width: 20px; height: 20px;
+      border: 2px solid #d1d5db;
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .check-item.done .check-box { background: #16a34a; border-color: #16a34a; color: white; }
+    .check-item.done .check-label { text-decoration: line-through; color: #9ca3af; }
+    .check-label { font-size: 0.88rem; font-weight: 500; }
+    .check-detail { font-size: 0.78rem; color: #6b7280; margin-top: 2px; }
+    .check-date { font-size: 0.78rem; color: #6b7280; white-space: nowrap; }
+
+    /* Notes */
+    .notes-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .note-card { background: white; border-radius: 10px; padding: 0.9rem 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.07); font-size: 0.88rem; line-height: 1.55; border-left: 4px solid #3b82f6; }
+    .note-card.warn { border-left-color: #f59e0b; }
+    .note-card.tip { border-left-color: #10b981; }
+
+    /* Accommodation banner */
+    .accom-banner {
+      background: linear-gradient(135deg, #0f172a, #1e3a8a);
+      color: white;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .accom-banner span { opacity: 0.7; margin-right: 0.25rem; }
+    .accom-item { background: rgba(255,255,255,0.1); border-radius: 6px; padding: 0.25rem 0.6rem; }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.4rem; }
+      .event-row { grid-template-columns: 90px 1fr; }
+      .ref-table { font-size: 0.78rem; }
+      .ref-table th, .ref-table td { padding: 0.5rem 0.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🇦🇺 Melbourne Holiday 2026</h1>
+  <p>4 July – 22 July &nbsp;·&nbsp; 19 days</p>
+  <div class="badge-row">
+    <div class="badge">🏠 4–6 Jul: Tarneit</div>
+    <div class="badge">🏠 6–22 Jul: Clyde North</div>
+    <div class="badge">🚗 Sydney 9–12 Jul</div>
+  </div>
+</header>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('itinerary', this)">📅 Itinerary</button>
+  <button class="tab-btn" onclick="switchTab('quickref', this)">⚡ Quick Reference</button>
+  <button class="tab-btn" onclick="switchTab('checklist', this)">✅ Pre-Booking</button>
+  <button class="tab-btn" onclick="switchTab('notes', this)">📌 Notes</button>
+</div>
+
+<!-- ═══════════════ ITINERARY TAB ═══════════════ -->
+<div id="itinerary" class="tab-content active">
+
+  <div class="accom-banner">
+    <span>🏠 Accommodation:</span>
+    <div class="accom-item">4–6 Jul: 5 Bradley Gr, Tarneit</div>
+    <div class="accom-item">6–22 Jul: 57 Skylark Bvd, Clyde North</div>
+  </div>
+
+  <!-- SAT 4 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Sat 4 Jul</div>
+      <div class="day-title">Taj Tarneit · The Park Werribee · Jai Ho Dinner</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">Morning</div><div class="event-details"><h4>Arrive &amp; settle in at Tarneit</h4><div class="loc">5 Bradley Gr, Tarneit</div></div></div>
+      <div class="event-row"><div class="event-time">11:00 AM</div><div class="event-details"><h4>Visit Taj, Tarneit</h4><div class="loc">Tarneit · 5 min from base</div></div></div>
+      <div class="event-row"><div class="event-time">12:30–2:00 PM</div><div class="event-details"><h4>Pub lunch at The Park, Werribee</h4><div class="loc">Werribee · ~10 min from Tarneit</div></div></div>
+      <div class="event-row"><div class="event-time">Afternoon</div><div class="event-details"><h4>Free — rest, explore local area</h4></div></div>
+      <div class="event-row"><div class="event-time">6:30 PM</div><div class="event-details"><h4>Dinner — Jai Ho Indian Restaurant</h4><div class="loc">Hoppers Crossing (Old Geelong Rd) · ~10 min</div><div class="note">Booking recommended</div></div></div>
+    </div>
+  </div>
+
+  <!-- SUN 5 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Sun 5 Jul</div>
+      <div class="day-title">Otways Tree Surfing</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">7:30 AM</div><div class="event-details"><h4>Depart Tarneit (early start)</h4><div class="loc">~2.5 hr drive via M1 / Colac</div></div></div>
+      <div class="event-row"><div class="event-time">10:00 AM</div><div class="event-details"><h4>Arrive Otway Fly Treetop Adventures</h4><div class="loc">Weeaproinah</div></div></div>
+      <div class="event-row"><div class="event-time">10:30 AM–1:00 PM</div><div class="event-details"><h4>Zipline Tour (2.5 hrs guided) — 5 kids booked ✓</h4><div class="note">✅ Already booked for 5 kids. Min age 5, min height 125cm. otwayfly.com.au</div></div></div>
+      <div class="event-row"><div class="event-time">1:30 PM</div><div class="event-details"><h4>Lunch — Dragon Chinese Restaurant</h4><div class="loc">Apollo Bay · ~15 min drive from Otway Fly</div></div></div>
+      <div class="event-row"><div class="event-time">3:00 PM</div><div class="event-details"><h4>Depart for Tarneit. Optional: Great Ocean Road scenic drive</h4><div class="loc">Arrive Tarneit 5:30–6:30 PM</div></div></div>
+    </div>
+  </div>
+
+  <!-- MON 6 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Mon 6 Jul</div>
+      <div class="day-title">Monash Uni · Luna Park · Criniti's · Move to Clyde North</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">9:30 AM</div><div class="event-details"><h4>Pack up and depart Tarneit for Monash University</h4><div class="loc">~50 min drive</div></div></div>
+      <div class="event-row"><div class="event-time">11:00 AM–3:00 PM</div><div class="event-details"><h4>Monash University campus tour <span class="badge-fixed">FIXED</span></h4><div class="loc">Monash University, Clayton</div></div></div>
+      <div class="event-row"><div class="event-time">3:15 PM</div><div class="event-details"><h4>Drive to Luna Park, St Kilda</h4><div class="loc">~30 min drive Clayton → St Kilda</div></div></div>
+      <div class="event-row"><div class="event-time">4:00–7:00 PM</div><div class="event-details"><h4>Luna Park — rides, games, foreshore walk</h4><div class="loc">18 Lower Esplanade, St Kilda</div><div class="note">Entry free; rides require a pass. Check lunapark.com.au for winter/school holiday evening hours.</div></div></div>
+      <div class="event-row"><div class="event-time">7:00 PM</div><div class="event-details"><h4>Dinner — Criniti's Docklands</h4><div class="loc">NewQuay Promenade, Docklands · ~15 min from St Kilda</div><div class="note">Italian — book ahead</div></div></div>
+      <div class="event-row"><div class="event-time">8:30 PM</div><div class="event-details"><h4>Drive to Clyde North</h4><div class="loc">~45 min · Arrive ~9:15 PM · 57 Skylark Bvd, Clyde North</div></div></div>
+    </div>
+  </div>
+
+  <!-- TUE 7 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Tue 7 Jul</div>
+      <div class="day-title">Mornington Peninsula — Enchanted + Red Gum BBQ</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">9:00 AM</div><div class="event-details"><h4>Depart Clyde North</h4><div class="loc">~1 hr drive to Arthurs Seat</div></div></div>
+      <div class="event-row"><div class="event-time">10:00 AM–1:00 PM</div><div class="event-details"><h4>Enchanted Adventure — mazes, Tube Slides, Canopy Walk, Sky Scramble</h4><div class="loc">55 Purves Rd, Arthurs Seat</div><div class="note">Optional upgrade to Tree Surfing (pre-book). Open 10am–5pm winter.</div></div></div>
+      <div class="event-row"><div class="event-time">1:30–2:30 PM</div><div class="event-details"><h4>Lunch — Red Gum BBQ (slow-smoked brisket, ribs, craft beers)</h4><div class="loc">87 Arthurs Seat Rd, Red Hill · ~10 min from Enchanted</div><div class="note">Book ahead — meats can sell out. redgumbbq.com.au</div></div></div>
+      <div class="event-row"><div class="event-time">3:00 PM</div><div class="event-details"><h4>Depart for Clyde North</h4><div class="loc">Arrive ~4:00 PM</div></div></div>
+    </div>
+  </div>
+
+  <!-- WED 8 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Wed 8 Jul</div>
+      <div class="day-title">RAAF Museum, Point Cook <span class="badge-optional">OPTIONAL</span></div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">9:00 AM</div><div class="event-details"><h4>Depart Clyde North</h4><div class="loc">~1 hr drive to Point Cook</div></div></div>
+      <div class="event-row"><div class="event-time">10:00 AM–12:30 PM</div><div class="event-details"><h4>RAAF Museum — aircraft displays, heritage exhibits</h4><div class="loc">RAAF Base Williams, Point Cook</div><div class="note">Free entry. Check raafmuseum.com.au for opening days/hours.</div></div></div>
+      <div class="event-row"><div class="event-time">12:30 PM</div><div class="event-details"><h4>Lunch nearby in Point Cook or Werribee</h4></div></div>
+      <div class="event-row"><div class="event-time">Afternoon</div><div class="event-details"><h4>Return to Clyde North · rest and pack for Sydney drive tomorrow</h4></div></div>
+    </div>
+  </div>
+
+  <!-- THU 9 JUL -->
+  <div class="day-card theme-sydney open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Thu 9 Jul</div>
+      <div class="day-title">🚗 Drive to Sydney (~8.5 hrs)</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">7:00 AM</div><div class="event-details"><h4>Depart Clyde North for Sydney</h4><div class="loc">Via M1 → Hume Hwy / M31</div></div></div>
+      <div class="event-row"><div class="event-time">10:00 AM</div><div class="event-details"><h4>Morning tea stop — Holbrook or Gundagai</h4></div></div>
+      <div class="event-row"><div class="event-time">12:30 PM</div><div class="event-details"><h4>Lunch stop — Yass or Goulburn</h4></div></div>
+      <div class="event-row"><div class="event-time">4:00–5:00 PM</div><div class="event-details"><h4>Arrive Sydney — check in</h4></div></div>
+      <div class="event-row"><div class="event-time">Evening</div><div class="event-details"><h4>Dinner — explore local area</h4></div></div>
+    </div>
+  </div>
+
+  <!-- FRI 10 JUL -->
+  <div class="day-card theme-sydney open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Fri 10 Jul</div>
+      <div class="day-title">Sydney — UNSW Tour · Harry Potter Exhibition</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">11:00 AM–1:00 PM</div><div class="event-details"><h4>UNSW Kensington campus tour <span class="badge-fixed">FIXED</span></h4><div class="loc">High St, Kensington, Sydney</div></div></div>
+      <div class="event-row"><div class="event-time">1:00 PM</div><div class="event-details"><h4>Lunch near campus — Kensington / Randwick</h4></div></div>
+      <div class="event-row"><div class="event-time">3:00–4:30 PM</div><div class="event-details"><h4>Harry Potter: The Exhibition</h4><div class="loc">Fever Pavilion, Sydney Olympic Park · ~25 min from Kensington</div><div class="note">Pre-book timed entry at ticketmaster.com.au. Allow 60–90 mins.</div></div></div>
+      <div class="event-row"><div class="event-time">Evening</div><div class="event-details"><h4>Dinner — Darling Harbour / Circular Quay / The Rocks</h4></div></div>
+    </div>
+  </div>
+
+  <!-- SAT 11 JUL -->
+  <div class="day-card theme-sydney open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Sat 11 Jul</div>
+      <div class="day-title">Sydney — Aviation School · Sightseeing</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">10:00 AM–12:00 PM</div><div class="event-details"><h4>Aviation school tour <span class="badge-fixed">FIXED</span></h4><div class="loc">Sydney</div></div></div>
+      <div class="event-row"><div class="event-time">12:30 PM</div><div class="event-details"><h4>Lunch</h4></div></div>
+      <div class="event-row"><div class="event-time">Afternoon</div><div class="event-details"><h4>Sydney sightseeing — Opera House, Bondi, Harbour Bridge, Taronga Zoo</h4></div></div>
+      <div class="event-row"><div class="event-time">Evening</div><div class="event-details"><h4>Dinner in Sydney (last night)</h4></div></div>
+    </div>
+  </div>
+
+  <!-- SUN 12 JUL -->
+  <div class="day-card theme-sydney open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Sun 12 Jul</div>
+      <div class="day-title">🚗 Drive back to Clyde North</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">7:00 AM</div><div class="event-details"><h4>Depart Sydney</h4></div></div>
+      <div class="event-row"><div class="event-time">12:00 PM</div><div class="event-details"><h4>Lunch stop en route</h4></div></div>
+      <div class="event-row"><div class="event-time">4:00–5:00 PM</div><div class="event-details"><h4>Arrive Clyde North</h4><div class="loc">57 Skylark Bvd</div></div></div>
+      <div class="event-row"><div class="event-time">Evening</div><div class="event-details"><h4>Rest and recover</h4></div></div>
+    </div>
+  </div>
+
+  <!-- MON 13 JUL -->
+  <div class="day-card theme-rest open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Mon 13 Jul</div>
+      <div class="day-title">😴 Rest Day 1</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">All day</div><div class="event-details"><h4>Recovery after Sydney road trip</h4><div class="loc">Light local activities, shopping</div></div></div>
+    </div>
+  </div>
+
+  <!-- TUE 14 JUL -->
+  <div class="day-card theme-rest open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Tue 14 Jul</div>
+      <div class="day-title">😴 Rest Day 2</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">All day</div><div class="event-details"><h4>Second rest day before Mt Baw Baw</h4></div></div>
+    </div>
+  </div>
+
+  <!-- WED 15 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Wed 15 Jul</div>
+      <div class="day-title">⛷️ Mt Baw Baw Skiing</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">6:30 AM</div><div class="event-details"><h4>Depart Clyde North (early start)</h4><div class="loc">~2 hr drive via M1 / Drouin exit</div></div></div>
+      <div class="event-row"><div class="event-time">8:00 AM</div><div class="event-details"><h4>Stop at Noojee — coffee, hire gear if needed</h4></div></div>
+      <div class="event-row"><div class="event-time">8:45 AM</div><div class="event-details"><h4>Arrive Mt Baw Baw Alpine Resort</h4></div></div>
+      <div class="event-row"><div class="event-time">9:30 AM–3:30 PM</div><div class="event-details"><h4>Skiing / snowboarding / tobogganing / snow play</h4><div class="note">Pre-buy resort entry + lift passes at mountbawbaw.com.au. Carry snow chains (required by law).</div></div></div>
+      <div class="event-row"><div class="event-time">4:00 PM</div><div class="event-details"><h4>Depart Mt Baw Baw</h4><div class="loc">Arrive Clyde North ~6:00 PM</div></div></div>
+    </div>
+  </div>
+
+  <!-- THU 16 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Thu 16 Jul</div>
+      <div class="day-title">🏎️ Phillip Island Go Karting</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">9:00 AM</div><div class="event-details"><h4>Depart Clyde North</h4><div class="loc">~1 hr 15 min drive</div></div></div>
+      <div class="event-row"><div class="event-time">10:15 AM</div><div class="event-details"><h4>Arrive Phillip Island Grand Prix Circuit</h4><div class="loc">Back Beach Rd, Ventnor</div></div></div>
+      <div class="event-row"><div class="event-time">10:30 AM–12:30 PM</div><div class="event-details"><h4>Go karting on 750m replica circuit + Motorsport Display + GP slot cars</h4><div class="note">Pre-book at phillipislandgokarts.com.au. Open 7 days, all weather.</div></div></div>
+      <div class="event-row"><div class="event-time">12:30 PM</div><div class="event-details"><h4>Lunch — Champions Café or Cowes township</h4></div></div>
+      <div class="event-row"><div class="event-time">1:30 PM</div><div class="event-details"><h4>Optional: Penguin Parade / The Nobbies / Koala Reserve</h4></div></div>
+      <div class="event-row"><div class="event-time">3:30 PM</div><div class="event-details"><h4>Depart Phillip Island</h4><div class="loc">Arrive Clyde North ~4:45 PM</div></div></div>
+    </div>
+  </div>
+
+  <!-- FRI 17 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Fri 17 Jul</div>
+      <div class="day-title">🏎️ Go Karting — Power Play Moorabbin</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">9:30 AM</div><div class="event-details"><h4>Head to Power Play from Clyde North</h4><div class="loc">Moorabbin · ~35 min drive</div></div></div>
+      <div class="event-row"><div class="event-time">10:30 AM–12:30 PM</div><div class="event-details"><h4>Go karting sessions</h4><div class="loc">Power Play, Moorabbin</div></div></div>
+      <div class="event-row"><div class="event-time">1:00 PM</div><div class="event-details"><h4>Lunch nearby</h4></div></div>
+      <div class="event-row"><div class="event-time">Afternoon</div><div class="event-details"><h4>Free — return to Clyde North, rest</h4></div></div>
+    </div>
+  </div>
+
+  <!-- SAT 18 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Sat 18 Jul</div>
+      <div class="day-title">⚽ Meher's Soccer · Dinner at Manjeet Aunty's</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">11:00 AM</div><div class="event-details"><h4>Meher's soccer match <span class="badge-fixed">FIXED</span></h4></div></div>
+      <div class="event-row"><div class="event-time">Afternoon</div><div class="event-details"><h4>Free — rest, explore, or shopping</h4></div></div>
+      <div class="event-row"><div class="event-time">5:30 PM</div><div class="event-details"><h4>Head to Manjeet Aunty's</h4><div class="loc">Taylors Hill · ~1 hr drive from Clyde North</div></div></div>
+      <div class="event-row"><div class="event-time">6:30 PM</div><div class="event-details"><h4>Dinner at Manjeet Aunty's home</h4><div class="loc">Taylors Hill</div></div></div>
+    </div>
+  </div>
+
+  <!-- SUN 19 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Sun 19 Jul</div>
+      <div class="day-title">🍷 Rochford Wines, Yarra Valley</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">10:00 AM</div><div class="event-details"><h4>Depart Clyde North</h4><div class="loc">~1 hr 15 min drive to Coldstream</div></div></div>
+      <div class="event-row"><div class="event-time">11:15 AM–1:00 PM</div><div class="event-details"><h4>Wine tasting (Cellar Door) or gin/whisky tasting (Spirited Bar)</h4><div class="loc">Rochford Wines, 878–880 Maroondah Hwy, Coldstream</div><div class="note">Open daily 9am–5pm. No booking needed for tastings.</div></div></div>
+      <div class="event-row"><div class="event-time">1:00 PM</div><div class="event-details"><h4>Lunch — Isabella's Restaurant or 400 Gradi Yarra Valley</h4><div class="note">Book restaurant ahead. rochfordwines.com.au</div></div></div>
+      <div class="event-row"><div class="event-time">2:30 PM</div><div class="event-details"><h4>Optional: Healesville Sanctuary or Yarra Valley Chocolaterie</h4><div class="loc">7 min from Rochford</div></div></div>
+      <div class="event-row"><div class="event-time">4:00 PM</div><div class="event-details"><h4>Depart for Clyde North</h4><div class="loc">Arrive ~5:15 PM</div></div></div>
+    </div>
+  </div>
+
+  <!-- MON 20 JUL -->
+  <div class="day-card theme-normal open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Mon 20 Jul</div>
+      <div class="day-title">Melbourne University Walking Tour <span class="badge-optional">OPTIONAL</span></div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">9:30 AM</div><div class="event-details"><h4>Depart Clyde North</h4><div class="loc">~50 min drive to Parkville</div></div></div>
+      <div class="event-row"><div class="event-time">10:30 AM–1:00 PM</div><div class="event-details"><h4>University of Melbourne walking tour — campus, Old Quad, South Lawn</h4><div class="loc">Grattan St, Parkville</div></div></div>
+      <div class="event-row"><div class="event-time">1:00 PM</div><div class="event-details"><h4>Lunch on Lygon Street, Carlton</h4></div></div>
+      <div class="event-row"><div class="event-time">Afternoon</div><div class="event-details"><h4>Free — explore Melbourne CBD, return to Clyde North</h4></div></div>
+    </div>
+  </div>
+
+  <!-- TUE 21 JUL -->
+  <div class="day-card theme-free open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Tue 21 Jul</div>
+      <div class="day-title">🎉 Free Day — Last Full Day</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time">All day</div><div class="event-details"><h4>Revisit favourites · QVM · laneways · Melbourne Museum</h4></div></div>
+    </div>
+  </div>
+
+  <!-- WED 22 JUL -->
+  <div class="day-card theme-depart open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <div class="day-date">Wed 22 Jul</div>
+      <div class="day-title">✈️ Departure</div>
+      <div class="day-chevron">▼</div>
+    </div>
+    <div class="day-body">
+      <div class="event-row"><div class="event-time"></div><div class="event-details"><h4>Departure day</h4></div></div>
+    </div>
+  </div>
+
+</div><!-- /itinerary -->
+
+<!-- ═══════════════ QUICK REFERENCE TAB ═══════════════ -->
+<div id="quickref" class="tab-content">
+  <div class="accom-banner" style="margin-bottom:1rem;">
+    <span>🏠</span>
+    <div class="accom-item">4–6 Jul: Tarneit</div>
+    <div class="accom-item">6–22 Jul: Clyde North</div>
+  </div>
+  <div style="overflow-x:auto;">
+  <table class="ref-table">
+    <thead>
+      <tr><th>Activity</th><th>Location</th><th>Drive Time</th><th>Day</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Taj</td><td>Tarneit</td><td>5 min (from Tarneit)</td><td>Sat 4 Jul</td></tr>
+      <tr><td>The Park (pub lunch)</td><td>Werribee</td><td>10 min (from Tarneit)</td><td>Sat 4 Jul</td></tr>
+      <tr><td>Jai Ho Restaurant</td><td>Hoppers Crossing</td><td>10 min (from Tarneit)</td><td>Sat 4 Jul (dinner)</td></tr>
+      <tr><td>Otways Tree Surfing</td><td>Weeaproinah</td><td>2.5 hrs (from Tarneit)</td><td>Sun 5 Jul</td></tr>
+      <tr><td>Monash University Tour</td><td>Clayton</td><td>50 min (from Tarneit)</td><td>Mon 6 Jul 11am–3pm ⚑</td></tr>
+      <tr><td>Luna Park</td><td>St Kilda</td><td>30 min (from Monash)</td><td>Mon 6 Jul (evening)</td></tr>
+      <tr><td>Criniti's Docklands</td><td>NewQuay Promenade</td><td>15 min (from St Kilda)</td><td>Mon 6 Jul (dinner)</td></tr>
+      <tr><td>Enchanted Adventure</td><td>Arthurs Seat, Mornington Peninsula</td><td>1 hr (from Clyde North)</td><td>Tue 7 Jul</td></tr>
+      <tr><td>Red Gum BBQ</td><td>Red Hill, Mornington Peninsula</td><td>1 hr (from Clyde North)</td><td>Tue 7 Jul</td></tr>
+      <tr><td>RAAF Museum (OPTIONAL)</td><td>Point Cook</td><td>1 hr (from Clyde North)</td><td>Wed 8 Jul</td></tr>
+      <tr><td>UNSW Kensington Campus Tour</td><td>Kensington, Sydney</td><td>In Sydney</td><td>Fri 10 Jul 11am ⚑</td></tr>
+      <tr><td>Harry Potter Exhibition</td><td>Sydney Olympic Park</td><td>In Sydney</td><td>Fri 10 Jul (afternoon)</td></tr>
+      <tr><td>Aviation School Tour</td><td>Sydney</td><td>In Sydney</td><td>Sat 11 Jul 10am ⚑</td></tr>
+      <tr><td>Mt Baw Baw Skiing</td><td>Mt Baw Baw Alpine Resort</td><td>2 hrs (from Clyde North)</td><td>Wed 15 Jul</td></tr>
+      <tr><td>Phillip Island Go Karting</td><td>Ventnor, Phillip Island</td><td>1 hr 15 min (from Clyde North)</td><td>Thu 16 Jul</td></tr>
+      <tr><td>Power Play Go Karting</td><td>Moorabbin</td><td>35 min (from Clyde North)</td><td>Fri 17 Jul</td></tr>
+      <tr><td>Meher's soccer match</td><td>TBC</td><td>—</td><td>Sat 18 Jul 11am ⚑</td></tr>
+      <tr><td>Dinner at Manjeet Aunty's</td><td>Taylors Hill</td><td>1 hr (from Clyde North)</td><td>Sat 18 Jul (evening)</td></tr>
+      <tr><td>Rochford Wines</td><td>Coldstream, Yarra Valley</td><td>1 hr 15 min (from Clyde North)</td><td>Sun 19 Jul</td></tr>
+      <tr><td>Melbourne University (OPTIONAL)</td><td>Parkville</td><td>50 min (from Clyde North)</td><td>Mon 20 Jul</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="font-size:0.78rem;color:#6b7280;margin-top:0.75rem;">⚑ = fixed/confirmed time</p>
+</div>
+
+<!-- ═══════════════ PRE-BOOKING TAB ═══════════════ -->
+<div id="checklist" class="tab-content">
+  <p style="font-size:0.85rem;color:#6b7280;margin-bottom:0.75rem;">Tap an item to mark it done.</p>
+  <div class="checklist">
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Jai Ho — dinner reservation</div><div class="check-detail">jaihoindianrestaurant.com.au · Hoppers Crossing</div></div><div class="check-date">Sat 4 Jul</div></div>
+    <div class="check-item done" onclick="toggleCheck(this)"><div class="check-box">✓</div><div><div class="check-label">Otway Fly Zipline Tour</div><div class="check-detail">✅ Booked for 5 kids · otwayfly.com.au</div></div><div class="check-date">Sun 5 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Luna Park — ride passes</div><div class="check-detail">lunapark.com.au — check winter evening hours</div></div><div class="check-date">Mon 6 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Criniti's Docklands — dinner reservation</div><div class="check-detail">crinitis.com.au · NewQuay Promenade</div></div><div class="check-date">Mon 6 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Enchanted Adventure — admission</div><div class="check-detail">enchantedadventure.com.au (+ Tree Surfing upgrade?)</div></div><div class="check-date">Tue 7 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Red Gum BBQ — table booking</div><div class="check-detail">redgumbbq.com.au</div></div><div class="check-date">Tue 7 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">RAAF Museum — check opening days (OPTIONAL)</div><div class="check-detail">raafmuseum.com.au · free entry</div></div><div class="check-date">Wed 8 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Sydney accommodation (2 nights)</div><div class="check-detail">Thu 9 & Fri 10 July</div></div><div class="check-date">Thu–Sat 9–11 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Harry Potter Exhibition Sydney</div><div class="check-detail">Timed entry — ticketmaster.com.au</div></div><div class="check-date">Fri 10 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">UNSW Kensington Campus Tour</div><div class="check-detail">Confirm booking for Fri 10 Jul, 11am</div></div><div class="check-date">Fri 10 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Aviation School Tour</div><div class="check-detail">Confirm booking for Sat 11 Jul, 10am</div></div><div class="check-date">Sat 11 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Mt Baw Baw — resort entry + lift passes</div><div class="check-detail">mountbawbaw.com.au</div></div><div class="check-date">Wed 15 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Snow chains — hire or purchase</div><div class="check-detail">Required by law for Mt Baw Baw</div></div><div class="check-date">Before 15 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Phillip Island Go Karts</div><div class="check-detail">phillipislandgokarts.com.au</div></div><div class="check-date">Thu 16 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Rochford Wines — restaurant booking</div><div class="check-detail">Isabella's or 400 Gradi · rochfordwines.com.au</div></div><div class="check-date">Sun 19 Jul</div></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">Melbourne University walking tour (OPTIONAL)</div><div class="check-detail">Parkville campus</div></div><div class="check-date">Mon 20 Jul</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ NOTES TAB ═══════════════ -->
+<div id="notes" class="tab-content">
+  <div class="notes-list">
+    <div class="note-card"><strong>🏠 Accommodation</strong><br>4–6 Jul at 5 Bradley Gr, Tarneit (western suburbs). From 6 Jul onwards at 57 Skylark Bvd, Clyde North (south-east).</div>
+    <div class="note-card tip"><strong>📍 Clyde North is well-positioned</strong><br>Monash Clayton ~25 min · Phillip Island ~1 hr 15 min · Mt Baw Baw ~2 hrs · Mornington Peninsula ~1 hr · Yarra Valley ~1 hr 15 min.</div>
+    <div class="note-card warn"><strong>🧙 Harry Potter Exhibition</strong><br>Closed in Melbourne (1 Feb 2026). Now at Fever Pavilion, Sydney Olympic Park until 11 Oct 2026 — slotted into the Sydney trip on Fri 10 Jul afternoon.</div>
+    <div class="note-card tip"><strong>🌿 Enchanted Adventure + Red Gum BBQ</strong><br>Both on the Mornington Peninsula (~10 min apart) — combined on Tue 7 Jul to minimise driving.</div>
+    <div class="note-card warn"><strong>⛷️ Mt Baw Baw — important</strong><br>Carry snow chains (required by law). Pre-buy resort entry online. Arrive before 11am for best conditions. Weekday visit avoids crowds. Scheduled Wed 15 Jul after 2 rest days post-Sydney.</div>
+    <div class="note-card"><strong>🌲 Otway Fly</strong><br>BYO food not permitted on premises — eat at Black Snail Café on-site or in your car before entering.</div>
+    <div class="note-card tip"><strong>🍺 Western Suburbs Cluster (Sat 4 Jul)</strong><br>Taj (Tarneit), The Park (Werribee), and Jai Ho (Hoppers Crossing) are all in the western suburbs corridor — grouped on arrival day to maximise convenience.</div>
+    <div class="note-card warn"><strong>🚗 Sydney Drive</strong><br>~8.5 hrs from Clyde North via M1/Hume Highway. Allow extra time for winter conditions and rest stops. Departure 7:00 AM Thu 9 Jul recommended.</div>
+    <div class="note-card"><strong>🍷 Rochford Wines</strong><br>Open daily 9am–5pm (Fri–Sat until 11pm). No booking needed for cellar door tastings — only book if dining at Isabella's or 400 Gradi restaurant.</div>
+    <div class="note-card"><strong>🏠 Taylors Hill (Manjeet Aunty)</strong><br>~1 hr drive from Clyde North on Sat 18 Jul evening. Allow travel time from wherever the soccer match is held.</div>
+  </div>
+</div>
+
+<script>
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function toggleDay(header) {
+    header.parentElement.classList.toggle('open');
+  }
+
+  function toggleCheck(item) {
+    item.classList.toggle('done');
+    const box = item.querySelector('.check-box');
+    box.textContent = item.classList.contains('done') ? '✓' : '';
+  }
+
+  // Collapse all day cards by default on mobile for a cleaner look
+  if (window.innerWidth < 600) {
+    document.querySelectorAll('.day-card').forEach(card => card.classList.remove('open'));
+  }
+</script>
+
+</body>
+</html>
